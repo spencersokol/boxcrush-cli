@@ -19,6 +19,9 @@ function parseRawArgs( rawArgs ) {
         uninstall: args[ '--uninstall' ] || false,
         targetDirectory: process.cwd(),
         softwareToInstall: undefined,
+        wordpress: {
+            version: '5.6'
+        },
         wordpressBoxcrushFramework: {
             siteURL: undefined,
             dbName: undefined,

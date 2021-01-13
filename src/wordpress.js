@@ -64,7 +64,7 @@ export async function createWordpressProject( options ) {
         },
         {
             title: 'Download Wordpress',
-            task: () => gitDownloadRepository( wpGitRepo, wpDir, 'Failed to download Wordpress.' )
+            task: () => gitDownloadRepository( wpGitRepo, wpDir, 'Failed to download Wordpress.', options.wordpress.version )
         },
         {
             title: 'Download Boxcrush Base Theme',

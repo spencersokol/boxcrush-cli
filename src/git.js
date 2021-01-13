@@ -16,9 +16,23 @@ export async function gitInit( directory ) {
     return;
 }
 
-export async function gitDownloadRepository( repositoryURI, directory, failMessage ) {
+export async function gitDownloadRepository( repositoryURI, directory, failMessage, branch = undefined ) {
 
-    const result = await execa( 'git', [ 'clone', '--depth=1', repositoryURI, directory ] );
+    let args = [];
+
+    args.push( 'clone' );
+    args.push( '--depth' );
+    args.push( '1' );
+
+    if ( branch ) {
+        args.push( '--branch' );
+        args.push( branch );
+    }
+
+    args.push( repositoryURI );
+    args.push( directory );
+
+    const result = await execa( 'git', args );
 
     if ( result.failed ) {
         return Promise.reject( new Error( failMessage ) );
