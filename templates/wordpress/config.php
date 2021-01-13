@@ -7,7 +7,7 @@ define( 'WP_DEBUG', false );
 define( 'DISALLOW_FILE_EDIT', true ); // Disabled file editing in the UI
 define( 'WP_MEMORY_LIMIT', '256M' );
  
-define( 'WP_DEFAULT_THEME', [[THEME_SANITIZED]] );
+define( 'WP_DEFAULT_THEME', '[[THEME_SANITIZED]]' );
  
 define( 'WP_HOME', '[[URL]]' );
 define( 'WP_SITEURL', '[[URL]]/wordpress' );

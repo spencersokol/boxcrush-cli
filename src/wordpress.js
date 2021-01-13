@@ -132,6 +132,12 @@ async function updateWordpressConfig( options, failMessage ) {
         const response = await got( 'https://api.wordpress.org/secret-key/1.1/salt/' );
         const config = path.join( options.targetDirectory, 'config.php' );
 
+        await replace( {
+            files: config,
+            from: /\[\[THEME_SANITIZED\]\]/g,
+            to: options.wordpressBoxcrushFramework.themeNameSanitized
+        } );
+
         await replace( { 
             files: config,
             from: '[[WORDPRESS_SALTS]]',
@@ -180,41 +186,45 @@ async function fillThemePlaceholders( options, directory, failMessage ) {
     const phpFiles = path.join( directory, '**/*.php' );
     const scssFiles = path.join( directory, '**/*.scss' );
     const jsFiles = path.join( directory, '**/*.js' );
-    const replacements = [
-        {
+
+    try {
+        
+        await replace( {
             files: phpFiles,
             from: /\[\[NAMESPACE\]\]/g,
             to: options.wordpressBoxcrushFramework.namespace
-        },
-        {
+        } );
+
+        await replace( {
             files: phpFiles,
             from: /\[\[THEME_NAME\]\]/g,
             to: options.wordpressBoxcrushFramework.themeName
-        },
-        {
+        } );
+
+        await replace( {
             files: phpFiles,
             from: /\[\[THEME_CONSTANT\]\]/g,
             to: options.wordpressBoxcrushFramework.domainConstant
-        },
-        {
+        } );
+        
+        await replace( {
             files: phpFiles,
             from: /\[\[THEME_SANITIZED\]\]/g,
             to: options.wordpressBoxcrushFramework.themeNameSanitized
-        },
-        {
+        } );
+        
+        await replace( {
             files: [ phpFiles, jsFiles ],
             from: /\[\[THEME_JAVASCRIPT_OBJECT\]\]/g,
             to: options.wordpressBoxcrushFramework.themeJSObject
-        },
-        {
+        } );
+        
+        await replace( {
             files: jsFiles,
             from: /__javascript_wordpress_theme_prefix/g,
             to: options.wordpressBoxcrushFramework.themeJSFunctionPrefix
-        }
-    ];
-
-    try {
-        replacements.forEach( async ( item ) => { await replace( item ); } );
+        } );
+        
     } catch ( error ) {
         return Promise.reject( new Error( failMessage ) );
     }
