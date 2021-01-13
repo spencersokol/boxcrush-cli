@@ -113,7 +113,7 @@ async function copyFiles( options, failMessage ) {
     );
 
     try {
-        await copy( path.join( templateDir, '.gitignore' ), path.join( options.targetDirectory, '.gitignore' ) );
+        await copy( path.join( templateDir, '_gitignore' ), path.join( options.targetDirectory, '.gitignore' ) );
         await copy( path.join( templateDir, '.code-workspace' ), path.join( options.targetDirectory, options.wordpressBoxcrushFramework.themeNameSanitized + '.code-workspace' ) );
         await copy( path.join( templateDir, 'config.php' ), path.join( options.targetDirectory, 'config.php' ) );
         await copy( path.join( templateDir, 'index.php' ), path.join( options.targetDirectory, 'index.php' ) );
