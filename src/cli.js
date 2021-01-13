@@ -1,12 +1,14 @@
 import arg from 'arg';
 import inquirer from 'inquirer';
-import { choiceWordpressBoxcrushFramework, choiceWordpress, createWordpressProject, isWordpressInstall } from './wordpress';
+import { choiceWordpressBoxcrushFramework, choiceWordpress, createWordpressProject, isWordpressInstall, uninstallWordpress } from './wordpress';
 
 function parseRawArgs( rawArgs ) {
     const args = arg(
         {
             '--install': Boolean,
-            '-i': '--install'
+            '--uninstall': Boolean,
+            '-i': '--install',
+            '-u': '--uninstall'
         },
         {
             argv: rawArgs.slice( 2 )
@@ -14,13 +16,21 @@ function parseRawArgs( rawArgs ) {
     );
     return {
         runInstall: args[ '--install' ] || false,
+        uninstall: args[ '--uninstall' ] || false,
         targetDirectory: process.cwd(),
         softwareToInstall: undefined,
         wordpressBoxcrushFramework: {
+            siteURL: undefined,
+            dbName: undefined,
+            dbUser: undefined,
+            dbPassword: undefined,
+            tablePrefix: undefined,
             namespace: undefined,
             themeName: undefined,
             themeNameSanitized: undefined,
             domainConstant: undefined,
+            themeJSObject: undefined,
+            themeJSFunctionPrefix: undefined
         }
     };
 }
@@ -64,6 +74,37 @@ async function promptForWordpressOptions( options ) {
 
     questions.push( {
         type: 'input',
+        name: 'siteURL',
+        message: 'Enter the development URL for this Wordpress install:'
+    } );
+
+    questions.push( {
+        type: 'input',
+        name: 'dbName',
+        message: 'Enter the database name for this Wordpress install:'
+    } );
+
+    questions.push( {
+        type: 'input',
+        name: 'dbUser',
+        message: 'Enter the database user for this Wordpress install:'
+    } );
+
+    questions.push( {
+        type: 'password',
+        name: 'dbPassword',
+        message: 'Enter the database password for this Wordpress install:'
+    } );
+
+    questions.push( {
+        type: 'input',
+        name: 'tablePrefix',
+        message: 'Enter the table prefix for this Wordpress install:',
+        default: 'wp_'
+    } );
+
+    questions.push( {
+        type: 'input',
         name: 'namespace',
         message: 'Enter a PHP namespace for the theme:'
     } );
@@ -78,7 +119,7 @@ async function promptForWordpressOptions( options ) {
         type: 'input',
         name: 'domainConstant',
         message: 'Enter a PHP constant name to use as a Wordpress text domain for the theme:'
-    })
+    } );
 
     const answers = await inquirer.prompt( questions );
 
@@ -91,15 +132,36 @@ async function promptForWordpressOptions( options ) {
         default: answers.themeName.split( ' ' ).join( '-' ).toLowerCase()
     } );
 
+    questions.push( {
+        type: 'input',
+        name: 'themeJSObject',
+        message: 'Enter the theme JavaScript objectName for the theme:',
+        default: answers.themeName.split( ' ' ).join( '' )
+    } );
+
+    questions.push( {
+        type: 'input',
+        name: 'themeJSFunctionPrefix',
+        message: 'Enter the JavaScript function prefix for the theme:',
+        default: answers.themeName.split( ' ' ).join( '_' ).toLowerCase()
+    } );
+
     const dependantAnswers = await inquirer.prompt( questions );
 
     return {
         ...options,
         wordpressBoxcrushFramework: {
+            siteURL: answers.siteURL,
+            dbName: answers.dbName,
+            dbUser: answers.dbUser,
+            dbPassword: answers.dbPassword,
+            tablePrefix: answers.tablePrefix,
             namespace: answers.namespace,
             themeName: answers.themeName,
             themeNameSanitized: dependantAnswers.themeNameSanitized,
             domainConstant: answers.domainConstant,
+            themeJSObject: dependantAnswers.themeJSObject,
+            themeJSFunctionPrefix: dependantAnswers.themeJSFunctionPrefix
         }
     }
 }
@@ -107,6 +169,11 @@ async function promptForWordpressOptions( options ) {
 export async function cli( args ) {
 
     let options = parseRawArgs( args );
+
+    if ( options.uninstall ) {
+        uninstallWordpress( options );
+        process.exit();
+    }
 
     // This will need expanded upon once we give this more functionality.
     // Right now we're just basically writing a Wordpress installer.

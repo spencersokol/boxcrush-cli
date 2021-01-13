@@ -1,6 +1,7 @@
 import execa from 'execa';
-import rimraf from 'rimraf';
+import del from 'del';
 import fs from 'fs';
+import path from 'path';
 
 export async function gitInit( directory ) {
     
@@ -17,18 +18,15 @@ export async function gitInit( directory ) {
 
 export async function gitDownloadRepository( repositoryURI, directory, failMessage ) {
 
-    const result = await execa( 'git', [ 'clone', repositoryURI, directory ] );
-    const gitignore = path.join( directory, '.gitignore' );
+    const result = await execa( 'git', [ 'clone', '--depth=1', repositoryURI, directory ] );
 
     if ( result.failed ) {
         return Promise.reject( new Error( failMessage ) );
     }
 
-    await rimraf( path.join( directory, '.git' ) );
-
-    fs.access( gitignore, fs.F_OK, () => {
-        fs.unlink( gitignore );
-    } );
+    await del( path.join( directory, '.git' ) );
+    await del( path.join( directory, '.gitignore' ) );
+    await del( path.join( directory, '.gitattributes' ) );
 
     return;
 }
@@ -40,6 +38,6 @@ export async function gitAddSubmodule( repositoryURI, directory, failMessage ) {
     if ( result.failed ) {
         return Promise.reject( new Error( failMessage ) );
     }
-    
+
     return;
 }
