@@ -93,6 +93,10 @@ export async function createWordpressProject( options ) {
         {
             title: 'Configure Boxcrush Base Theme',
             task: () => fillThemePlaceholders( options, themeDir, 'Unable to configure Boxcrush Base Theme.' )
+        },
+        {
+            title: 'Cleaning up...',
+            task: () => deleteFiles( themeDir, 'Unable to clean up installation detritus.' )
         }
     ] );
 
@@ -124,6 +128,17 @@ async function copyFiles( options, failMessage ) {
 
     return true;
 
+}
+
+async function deleteFiles( themeDir, failMessage ) {
+
+    try {
+        await del( path.join( themeDir, 'boxcrush-wordpress-theme-base.code-workspace' ) )
+    } catch ( error ) {
+        return Promise.reject( new Error( failMessage ) );
+    }
+
+    return true;
 }
 
 async function updateWordpressConfig( options, failMessage ) {

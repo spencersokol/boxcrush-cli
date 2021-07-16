@@ -1,10 +1,10 @@
 {
-  "name": "boxcrush-cli",
+  "name": "@boxcrush/cli",
   "version": "1.0.0",
   "description": "Boxcrush CLI",
   "main": "src/cli.js",
   "bin": {
-    "@idkwtm/boxcrush": "bin/boxcrush",
+    "cli": "bin/boxcrush",
     "boxcrush": "bin/boxcrush"
   },
   "publishConfig": {
@@ -39,5 +39,6 @@
     "mkdirp": "^1.0.4",
     "ncp": "^2.0.0",
     "replace-in-file": "^6.1.0"
-  }
+  },
+  "devDependencies": {}
 }
